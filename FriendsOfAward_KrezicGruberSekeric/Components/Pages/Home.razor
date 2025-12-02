@@ -1,4 +1,5 @@
 ﻿@page "/"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 <div class="legende">
@@ -7,10 +8,13 @@
     <h3>Einfacher Klick: Favorit (Maximal 5)</h3>
     <h3>Doppelklick: Topfavorit (Maximal 1)</h3>
     <h4>Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</h4>
-@for(int i = 1; i <= count; i++)
-{
-    <button @onclick="btn_button">@i.ToString()</button>
-}
+
+    @foreach (var button in ButtonsList)
+    {
+        <button @onclick="btn_button" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>
+    }
+    
+
 <p>Offen: @favoriten Favoriten, @topfavorit Topfavorit</p>
 </div>
 
@@ -18,8 +22,21 @@
     private int count = 20;
     private int favoriten = 5;
     private int topfavorit = 1;
+    private string styleClass = "";
+
+    private List<(int, int, int)> ButtonsList = new(); //Buttonname, vote, topvote
+
+    protected override void OnInitialized()
+    {
+        for (int i = 1; i <= count; i++)
+        {
+            var button = (i, 0, 0);
+            ButtonsList.Add(button);
+        }
+    }
+
     private void btn_button()
     {
-        count++;
+        
     }
 }
