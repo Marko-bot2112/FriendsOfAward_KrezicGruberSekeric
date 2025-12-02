@@ -2,6 +2,21 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Friends of Award</h1>
+<h3>Geben Sie uns Ihre persönlichen Favoriten!</h3>
+<h3>Einfacher Klick: Favorit (Maximal 5)</h3>
+<h3>Doppelklick: Topfavorit (Maximal 1)</h3>
+<h4>Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</h4>
 
-Welcome to your new app.
+@for(int i = 1; i <= count; i++)
+{
+    <button @onclick="btn_button">@i.ToString()</button>
+}
+
+@code {
+    private int count = 20;
+    private void btn_button()
+    {
+        count++;
+    }
+}
