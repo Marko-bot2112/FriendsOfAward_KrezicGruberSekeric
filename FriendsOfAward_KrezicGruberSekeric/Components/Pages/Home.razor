@@ -6,12 +6,19 @@
     <h3>Geben Sie uns Ihre persönlichen Favoriten!</h3>
     <h3>Einfacher Klick: Favorit (Maximal 5)</h3>
     <h3>Doppelklick: Topfavorit (Maximal 1)</h3>
-    <h4>Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</h4>
-@for(int i = 1; i <= count; i++)
-{
-    <button @onclick="btn_button">@i.ToString()</button>
-}
-<p>Offen: @favoriten Favoriten, @topfavorit Topfavorit</p>
+    <p class="small-note">Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</p>
+    <button @onclick="btn_resetAll">Gesamte Auswahl Löschen</button>
+
+    <div class="button_grid">
+        @for(int i = 1; i <= count; i++)
+        {
+                <button @onclick="btn_button">@i.ToString()</button>
+        }
+    </div>
+    
+    <p>Offen: @favoriten Favoriten, @topfavorit Topfavorit</p>
+
+    <button @onclick="btn_submit">Bewertung Absenden</button>
 </div>
 
 @code {
@@ -21,5 +28,15 @@
     private void btn_button()
     {
         count++;
+    }
+
+    private void btn_submit()
+    {
+
+    }
+
+    private void btn_resetAll()
+    {
+        
     }
 }
