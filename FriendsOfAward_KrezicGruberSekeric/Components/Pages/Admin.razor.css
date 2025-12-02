@@ -1,0 +1,8 @@
+﻿namespace FriendsOfAward_KrezicGruberSekeric.Components.Pages {
+    public class Admin {
+        .admin {
+            position: relative;
+            text-align: center;
+        }
+    }
+}
