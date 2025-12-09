@@ -11,32 +11,65 @@
 
     @foreach (var button in ButtonsList)
     {
-        <button @onclick="btn_button" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>
+        <button @onclick="() => OneClick(button)" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>
     }
-    
-
-<p>Offen: @favoriten Favoriten, @topfavorit Topfavorit</p>
+    <p>Offen: @maxfavoriten Favoriten, @maxtopfavorit Topfavorit</p>
 </div>
 
 @code {
     private int count = 20;
-    private int favoriten = 5;
-    private int topfavorit = 1;
+    private int maxfavoriten = 5;
+    private int maxtopfavorit = 1;
     private string styleClass = "";
 
-    private List<(int, int, int)> ButtonsList = new(); //Buttonname, vote, topvote
+    private List<(int, int)> ButtonsList = new(); //Buttonname, vote, topvote
 
     protected override void OnInitialized()
     {
         for (int i = 1; i <= count; i++)
         {
-            var button = (i, 0, 0);
+            var button = (i, 0);
             ButtonsList.Add(button);
         }
     }
 
-    private void btn_button()
+    private void OneClick((int,int) btn)
     {
-        
+        var idx = ButtonsList.FindIndex(b => b.Item1 == btn.Item1);
+
+        switch (btn.Item2)
+        {
+            case 0:
+                if (maxfavoriten > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 1);
+                    maxfavoriten--;
+                }
+                else if (maxtopfavorit > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 2);
+                    maxtopfavorit--;
+                }
+                break;
+
+            case 1:
+                if (maxtopfavorit > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 2);
+                    maxtopfavorit--;
+                    maxfavoriten++; 
+                }
+                else
+                {
+                    ButtonsList[idx] = (btn.Item1, 0);
+                    maxfavoriten++;
+                }
+                break;
+
+            case 2:
+                ButtonsList[idx] = (btn.Item1, 0);
+                maxtopfavorit++;
+                break;
+        }
     }
 }

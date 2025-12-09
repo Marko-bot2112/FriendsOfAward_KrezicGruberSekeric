@@ -4,3 +4,11 @@
     position: relative;
     text-align: center;
 }
+
+.favorit {
+    background-color: yellow;
+}
+
+.topfavorit{
+    background-color: green;
+}
