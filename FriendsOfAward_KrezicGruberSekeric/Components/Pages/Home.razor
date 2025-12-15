@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/{token}"
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -14,9 +14,14 @@
         <button @onclick="() => OneClick(button)" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>
     }
     <p>Offen: @maxfavoriten Favoriten, @maxtopfavorit Topfavorit</p>
+
+    <button @onclick="BewertungAbschicken">Bewertung Abschicken</button>
 </div>
 
 @code {
+    [Parameter]
+    public string token { get; set; } = "";
+
     private int count = 20;
     private int maxfavoriten = 5;
     private int maxtopfavorit = 1;
@@ -71,5 +76,16 @@
                 maxtopfavorit++;
                 break;
         }
+    }
+
+    private void BewertungAbschicken()
+    {
+        List<(int, int)> Votes = new();
+        foreach (var item in ButtonsList)
+        {
+            if (item.Item2 != 0) Votes.Add(item);
+        }
+
+
     }
 }
