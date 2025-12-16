@@ -1,4 +1,4 @@
-﻿@page "/{token}"
+﻿@page "/vote/{token}"
 @rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
@@ -7,15 +7,20 @@
     <h3>Geben Sie uns Ihre persönlichen Favoriten!</h3>
     <h3>Einfacher Klick: Favorit (Maximal 5)</h3>
     <h3>Doppelklick: Topfavorit (Maximal 1)</h3>
-    <h4>Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</h4>
+    <p class="small-note">Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</p>
+    <button @onclick="Btn_ResetAll">Gesamte Auswahl Löschen</button>
 
-    @foreach (var button in ButtonsList)
-    {
-        <button @onclick="() => OneClick(button)" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>
-    }
+    <div class="button_grid">
+        @foreach (var button in ButtonsList)
+        {
+            <button @onclick="() => Btn_OnClick(button)" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>            
+        }
+        
+    </div>
+    
     <p>Offen: @maxfavoriten Favoriten, @maxtopfavorit Topfavorit</p>
 
-    <button @onclick="BewertungAbschicken">Bewertung Abschicken</button>
+    <button @onclick="Btn_BewertungAbschicken">Bewertung Absenden</button>
 </div>
 
 @code {
@@ -38,7 +43,7 @@
         }
     }
 
-    private void OneClick((int,int) btn)
+    private void Btn_OnClick((int,int) btn)
     {
         var idx = ButtonsList.FindIndex(b => b.Item1 == btn.Item1);
 
@@ -78,14 +83,17 @@
         }
     }
 
-    private void BewertungAbschicken()
+    private void Btn_BewertungAbschicken()
     {
         List<(int, int)> Votes = new();
         foreach (var item in ButtonsList)
         {
             if (item.Item2 != 0) Votes.Add(item);
         }
+    }
 
-
+    private void Btn_ResetAll()
+    {
+        
     }
 }
