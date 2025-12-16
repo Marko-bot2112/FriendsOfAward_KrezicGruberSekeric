@@ -8,18 +8,19 @@
     <h3>Einfacher Klick: Favorit (Maximal 5)</h3>
     <h3>Doppelklick: Topfavorit (Maximal 1)</h3>
     <p class="small-note">Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</p>
-    <button @onclick="btn_resetAll">Gesamte Auswahl Löschen</button>
+    <button @onclick="Btn_ResetAll">Gesamte Auswahl Löschen</button>
 
     <div class="button_grid">
-        @for(int i = 1; i <= count; i++)
+        @foreach (var button in ButtonsList)
         {
-                <button @onclick="btn_button">@i.ToString()</button>
+            <button @onclick="() => Btn_OnClick(button)" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>            
         }
+        
     </div>
     
-    <p>Offen: @favoriten Favoriten, @topfavorit Topfavorit</p>
+    <p>Offen: @maxfavoriten Favoriten, @maxtopfavorit Topfavorit</p>
 
-    <button @onclick="btn_submit">Bewertung Absenden</button>
+    <button @onclick="Btn_BewertungAbschicken">Bewertung Absenden</button>
 </div>
 
 @code {
@@ -42,7 +43,7 @@
         }
     }
 
-    private void OneClick((int,int) btn)
+    private void Btn_OnClick((int,int) btn)
     {
         var idx = ButtonsList.FindIndex(b => b.Item1 == btn.Item1);
 
@@ -82,14 +83,17 @@
         }
     }
 
-    private void BewertungAbschicken()
+    private void Btn_BewertungAbschicken()
     {
         List<(int, int)> Votes = new();
         foreach (var item in ButtonsList)
         {
             if (item.Item2 != 0) Votes.Add(item);
         }
+    }
 
-
+    private void Btn_ResetAll()
+    {
+        
     }
 }
