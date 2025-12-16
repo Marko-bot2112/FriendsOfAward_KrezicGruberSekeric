@@ -1,8 +1,95 @@
-﻿namespace FriendsOfAward_KrezicGruberSekeric.Components.Pages {
-    public class Admin {
-        .admin {
+﻿        .login-bg {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0f4c81, #1e88e5);
+        }
+
+        .login-wrapper {
             position: relative;
+        }
+
+        .login-avatar {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            background: #0d47a1;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .login-card {
+            width: 320px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 18px;
+            padding: 3rem 2rem 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
             text-align: center;
         }
-    }
-}
+
+            .login-card h2 {
+                margin-bottom: 1.5rem;
+                font-size: 1.4rem;
+                color: #0d47a1;
+            }
+
+            .login-card input {
+                width: 100%;
+                height: 44px;
+                border-radius: 8px;
+                border: none;
+                padding: 0 12px;
+                background: #e3f2fd;
+                font-size: 1rem;
+                margin-bottom: 1rem;
+            }
+
+                .login-card input:focus {
+                    outline: none;
+                    background: #bbdefb;
+                }
+
+        .login-btn {
+            width: 100%;
+            height: 46px;
+            border: none;
+            border-radius: 10px;
+            background: #1565c0;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+            .login-btn:active {
+                transform: scale(0.96);
+            }
+
+        .logout-btn {
+            width: 100%;
+            height: 42px;
+            background: #c62828;
+            border: none;
+            border-radius: 10px;
+            color: white;
+        }
+
+        .error {
+            color: #c62828;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .success {
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }   

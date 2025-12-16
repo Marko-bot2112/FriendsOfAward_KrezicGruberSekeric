@@ -2,30 +2,44 @@
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 
-<h1>Admin</h1>
+<div class="login-bg">
+    <div class="login-wrapper">
 
-@if (!IsAdmin)
-{
-    <div>
-        <label>Admin-Code:</label><br/>
-        <input type="password" @bind="adminCode" />
-        <br /><br />
-        <button class="btn btn-success" @onclick="LoginAdmin">Login</button>
+        <div class="login-avatar">
+            👤
+        </div>
 
-        @if (!string.IsNullOrEmpty(error))
-        {
-            <p style="color:red">@error</p>
-        }
+        <div class="login-card">
+            <h2>Admin Login</h2>
+
+            @if (!IsAdmin)
+            {
+                <input type="password"
+                       placeholder="Admin-Code"
+                       @bind="adminCode"
+                       @onkeydown="HandleKeyDown" />
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <p class="error">@error</p>
+                }
+
+                <button class="login-btn" @onclick="LoginAdmin">
+                    LOGIN
+                </button>
+            }
+            else
+            {
+                <p class="success">🔐 Eingeloggt</p>
+
+                <button class="logout-btn" @onclick="LogoutAdmin">
+                    Logout
+                </button>
+            }
+        </div>
+
     </div>
-}
-else
-{
-    <h3>🔐 Admin-Page</h3>
-
-
-
-    <button class="btn btn-danger" @onclick="LogoutAdmin">Logout</button>
-}
+</div>
 
 @code {
     private string adminCode;
@@ -34,7 +48,7 @@ else
 
     private void LoginAdmin()
     {
-        if (adminCode == "1234")  // Passwort hier direkt
+        if (adminCode == "1234")
         {
             IsAdmin = true;
             error = null;
@@ -49,5 +63,13 @@ else
     {
         IsAdmin = false;
         Nav.NavigateTo("/");
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            LoginAdmin();
+        }
     }
 }
