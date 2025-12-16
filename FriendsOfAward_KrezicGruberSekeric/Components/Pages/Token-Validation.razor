@@ -1,0 +1,48 @@
+﻿@page "/validation/{token}"
+@rendermode InteractiveServer
+@inject NavigationManager nav
+<span class="blazor-error-boundary">@message</span>
+@code {
+    [Parameter]
+    public string token { get; set; } = "";
+    private string message = "";
+
+    private void CheckToken()
+    {
+        try
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+            string foundToken = "";
+            string sqlCmd = "SELECT token FROM foa_tokens WHERE token = '7c9f2e6a-1d2b-4f3a-9c0a-6c9d8f1a2b34'";
+            wrappr.Open();
+            DataTable dt = wrappr.RunQuery(sqlCmd);
+            foreach (DataRow item in dt.Rows)
+            {
+                foundToken = item[1].ToString();
+            }
+
+            if(foundToken.Length == 0)
+            {
+                sqlCmd = $"INSERT INTO foa_tokens (token) VALUES ('{token}')";
+                wrappr.Open();
+                wrappr.RunNonQuery(sqlCmd);
+
+                nav.NavigateTo($"/vote/{token}");
+            }
+            else if(token.Length > 0)
+            {
+                nav.NavigateTo($"/vote/{token}");
+            }
+            else
+            {
+                message = "Token ungültig";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+
+
+    }
+}
