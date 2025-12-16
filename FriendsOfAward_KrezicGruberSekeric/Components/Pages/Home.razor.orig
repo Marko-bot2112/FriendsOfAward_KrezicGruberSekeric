@@ -1,0 +1,25 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+<div class="legende">
+    <h1>Friends of Award</h1>
+    <h3>Geben Sie uns Ihre persönlichen Favoriten!</h3>
+    <h3>Einfacher Klick: Favorit (Maximal 5)</h3>
+    <h3>Doppelklick: Topfavorit (Maximal 1)</h3>
+    <h4>Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</h4>
+@for(int i = 1; i <= count; i++)
+{
+    <button @onclick="btn_button">@i.ToString()</button>
+}
+<p>Offen: @favoriten Favoriten, @topfavorit Topfavorit</p>
+</div>
+
+@code {
+    private int count = 20;
+    private int favoriten = 5;
+    private int topfavorit = 1;
+    private void btn_button()
+    {
+        count++;
+    }
+}

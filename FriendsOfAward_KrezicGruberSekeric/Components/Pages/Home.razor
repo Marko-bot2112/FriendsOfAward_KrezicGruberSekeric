@@ -1,4 +1,5 @@
-﻿@page "/"
+﻿@page "/{token}"
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 <div class="legende">
@@ -22,21 +23,73 @@
 </div>
 
 @code {
+    [Parameter]
+    public string token { get; set; } = "";
+
     private int count = 20;
-    private int favoriten = 5;
-    private int topfavorit = 1;
-    private void btn_button()
+    private int maxfavoriten = 5;
+    private int maxtopfavorit = 1;
+    private string styleClass = "";
+
+    private List<(int, int)> ButtonsList = new(); //Buttonname, vote, topvote
+
+    protected override void OnInitialized()
     {
-        count++;
+        for (int i = 1; i <= count; i++)
+        {
+            var button = (i, 0);
+            ButtonsList.Add(button);
+        }
     }
 
-    private void btn_submit()
+    private void OneClick((int,int) btn)
     {
+        var idx = ButtonsList.FindIndex(b => b.Item1 == btn.Item1);
 
+        switch (btn.Item2)
+        {
+            case 0:
+                if (maxfavoriten > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 1);
+                    maxfavoriten--;
+                }
+                else if (maxtopfavorit > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 2);
+                    maxtopfavorit--;
+                }
+                break;
+
+            case 1:
+                if (maxtopfavorit > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 2);
+                    maxtopfavorit--;
+                    maxfavoriten++; 
+                }
+                else
+                {
+                    ButtonsList[idx] = (btn.Item1, 0);
+                    maxfavoriten++;
+                }
+                break;
+
+            case 2:
+                ButtonsList[idx] = (btn.Item1, 0);
+                maxtopfavorit++;
+                break;
+        }
     }
 
-    private void btn_resetAll()
+    private void BewertungAbschicken()
     {
-        
+        List<(int, int)> Votes = new();
+        foreach (var item in ButtonsList)
+        {
+            if (item.Item2 != 0) Votes.Add(item);
+        }
+
+
     }
 }

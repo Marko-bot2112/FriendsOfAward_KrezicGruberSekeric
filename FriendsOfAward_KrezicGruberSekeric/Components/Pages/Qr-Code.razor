@@ -1,0 +1,27 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+
+<h3>QR-Code</h3>
+<button @onclick="CreateQrCode">Generate</button>
+<img src="@QrCodeImg" />
+
+@code {
+    private string? QrCodeImg;
+    private void CreateQrCode()
+    {
+        // 1. Unique Token
+        var token = Guid.NewGuid().ToString();
+
+        // 3. Payload (Beispiel)
+        var payload = $"http://172.17.7.71:5432/{token}";
+
+        // 4. QR-Code erzeugen
+        using var qrGenerator = new QRCoder.QRCodeGenerator();
+        using var qrData = qrGenerator.CreateQrCode(payload, QRCoder.QRCodeGenerator.ECCLevel.Q);
+        using var qrCode = new QRCoder.PngByteQRCode(qrData);
+
+        var qrBytes = qrCode.GetGraphic(20);
+        QrCodeImg = $"data:image/png;base64,{Convert.ToBase64String(qrBytes)}";
+    }
+}
