@@ -18,7 +18,7 @@
             var token = Guid.NewGuid().ToString();
 
             // 3. Payload (Beispiel)
-            var payload = $"http://172.17.10.81:5432/{token}";
+            var payload = $"http://172.17.10.81:5432/vote/{token}";
 
             // 4. QR-Code erzeugen
             using var qrGenerator = new QRCoder.QRCodeGenerator();
