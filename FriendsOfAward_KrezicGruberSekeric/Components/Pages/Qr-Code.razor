@@ -27,7 +27,6 @@
 
             var qrBytes = qrCode.GetGraphic(20);
             QrCodeImg = $"data:image/png;base64,{Convert.ToBase64String(qrBytes)}";
-
         }
         catch (Exception ex)
         {
