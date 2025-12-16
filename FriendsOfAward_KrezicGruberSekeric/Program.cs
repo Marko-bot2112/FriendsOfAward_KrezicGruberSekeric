@@ -1,12 +1,22 @@
-using FriendsOfAward_KrezicGruberSekeric.Components;
+﻿using FriendsOfAward_KrezicGruberSekeric.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddHttpContextAccessor();
+
+// Register a distributed cache (in-memory for single-server dev)
+builder.Services.AddDistributedMemoryCache();
+
+// Register session after the cache
+builder.Services.AddSession();
 
 var app = builder.Build();
+
+app.UseSession(); // enable session middleware
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

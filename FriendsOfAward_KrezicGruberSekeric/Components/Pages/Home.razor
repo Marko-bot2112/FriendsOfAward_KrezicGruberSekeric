@@ -1,1 +1,14 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+
+<button @onclick="Btn_GoToAdmin">
+    Zum Admin-Bereich
+</button>
+
+@code {
+    void Btn_GoToAdmin()
+    {
+        Nav.NavigateTo("/admin");
+    }
+}

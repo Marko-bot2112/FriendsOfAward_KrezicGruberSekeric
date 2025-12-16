@@ -1,15 +1,53 @@
 ﻿@page "/admin"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
 
-<div class="admin">
-    <label>Admin-Code:</label>
-    <input type="password" />
-    <button onclick="loginAdmin()">Login</button>
-    <button onclick="logoutAdmin()">Logout</button>
-</div>
+<h1>Admin</h1>
+
+@if (!IsAdmin)
+{
+    <div>
+        <label>Admin-Code:</label><br/>
+        <input type="password" @bind="adminCode" />
+        <br /><br />
+        <button class="btn btn-success" @onclick="LoginAdmin">Login</button>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <p style="color:red">@error</p>
+        }
+    </div>
+}
+else
+{
+    <h3>🔐 Admin-Page</h3>
+
+
+
+    <button class="btn btn-danger" @onclick="LogoutAdmin">Logout</button>
+}
 
 @code {
-    private void loginAdmin()
-    {
+    private string adminCode;
+    private string error;
+    private bool IsAdmin = false;
 
+    private void LoginAdmin()
+    {
+        if (adminCode == "1234")  // Passwort hier direkt
+        {
+            IsAdmin = true;
+            error = null;
+        }
+        else
+        {
+            error = "Falscher Admin-Code";
+        }
+    }
+
+    private void LogoutAdmin()
+    {
+        IsAdmin = false;
+        Nav.NavigateTo("/");
     }
 }
