@@ -1,12 +1,18 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+<div class="page-background">
+    <div class="qr-container">
+        <h3>QR-Code</h3>
+        <p class="small-note">
+            Scanne den Code und Vote für die beste Diplomarbeit in deinen Augen
+        </p>
+        <button class="qr-button" @onclick="CreateQrCode">Generate</button>
+        <img class="qr-image" src="@QrCodeImg" alt="" />
 
+        <span>@message</span>
+    </div>
+</div>
 
-<h3>QR-Code</h3>
-<button @onclick="CreateQrCode">Generate</button>
-<img src="@QrCodeImg" alt=""/>
-
-<span>@message</span>
 @code {
     private string? QrCodeImg;
     string message = "";
@@ -18,7 +24,7 @@
             var token = Guid.NewGuid().ToString();
 
             // 3. Payload (Beispiel)
-            var payload = $"http://172.17.10.84:5432/vote/{token}";
+            var payload = $"http://0.0.0.0:5432/vote/{token}";
 
             // 4. QR-Code erzeugen
             using var qrGenerator = new QRCoder.QRCodeGenerator();
