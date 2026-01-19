@@ -1,6 +1,6 @@
 ﻿@page "/vote/{token}"
 @rendermode InteractiveServer
-@inject NavigationManager Nav
+@inject NavigationManager nav
 
 <button class="admin-btn" @onclick="Btn_GoToAdmin">Admin-Login</button>
 
@@ -38,9 +38,9 @@
 
     void Btn_GoToAdmin()
     {
-        Nav.NavigateTo("/admin");
+        nav.NavigateTo("/admin");
     }
-    
+
     protected override void OnInitialized()
     {
         for (int i = 1; i <= count; i++)
@@ -96,6 +96,37 @@
         foreach (var item in ButtonsList)
         {
             if (item.Item2 != 0) Votes.Add(item);
+        }
+
+        try
+        {
+            string sqlCmd = "";
+            foreach (var item in Votes)
+            {
+                if(item.Item2 == 1)
+                {
+                    sqlCmd = $"UPDATE foa_diplomarbeiten SET stimmen = stimmen + 1 WHERE id = {item.Item1}";
+                }
+                else // Topfavorit
+                {
+                    sqlCmd = $"UPDATE foa_diplomarbeiten SET stimmen = stimmen + 2 WHERE id = {item.Item1}";
+                }
+
+                DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+                DataTable dt = wrappr.RunQuery(sqlCmd);
+            }
+
+            if(Votes.Count != 0)
+            {
+                sqlCmd = $"UPDATE foa_tokens SET used = 1 WHERE token = '{token}'";
+                DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+                DataTable dt = wrappr.RunQuery(sqlCmd);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            
         }
     }
 
