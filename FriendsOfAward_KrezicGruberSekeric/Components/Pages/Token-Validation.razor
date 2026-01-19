@@ -1,0 +1,48 @@
+﻿@page "/validation/{token}"
+@rendermode InteractiveServer
+@inject NavigationManager nav
+@if(message.Length > 0)
+{
+    <span class="blazor-error-boundary">@message</span>
+}
+@code {
+    [Parameter]
+    public string token { get; set; } = "";
+    private string message = "";
+    private string foundToken = "";
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        CheckToken();  
+    }  
+    
+    private void CheckToken()
+    {
+        // Derzeit noch möglich selber einen Token zu erstellen
+        //primitive Lösung
+
+        try
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+            string sqlCmd = $"SELECT token FROM foa_tokens WHERE token = '{token}'";
+            DataTable dt = wrappr.RunQuery(sqlCmd);
+            if (dt.Rows.Count == 0)
+            {
+                sqlCmd = $"INSERT INTO foa_tokens (token) VALUES ('{token}')";
+                wrappr.RunNonQuery(sqlCmd);
+
+                nav.NavigateTo($"/vote/{token}");
+            }
+            else
+            {
+                nav.NavigateTo($"/vote/{token}");
+            }
+        }
+        catch (Exception ex)
+        {
+            message = ex.Message;
+        }
+
+
+    }
+}
