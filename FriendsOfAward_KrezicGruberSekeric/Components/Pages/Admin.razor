@@ -1,0 +1,75 @@
+﻿@page "/admin"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+
+<div class="login-bg">
+    <div class="login-wrapper">
+
+        <div class="login-avatar">
+            👤
+        </div>
+
+        <div class="login-card">
+            <h2>Admin Login</h2>
+
+            @if (!IsAdmin)
+            {
+                <input type="password"
+                       placeholder="Admin-Code"
+                       @bind="adminCode"
+                       @onkeydown="HandleKeyDown" />
+
+                @if (!string.IsNullOrEmpty(error))
+                {
+                    <p class="error">@error</p>
+                }
+
+                <button class="login-btn" @onclick="LoginAdmin">
+                    LOGIN
+                </button>
+            }
+            else
+            {
+                <p class="success">🔐 Eingeloggt</p>
+
+                <button class="logout-btn" @onclick="LogoutAdmin">
+                    Logout
+                </button>
+            }
+        </div>
+
+    </div>
+</div>
+
+@code {
+    private string adminCode;
+    private string error;
+    private bool IsAdmin = false;
+
+    private void LoginAdmin()
+    {
+        if (adminCode == "1234")
+        {
+            IsAdmin = true;
+            error = null;
+        }
+        else
+        {
+            error = "Falscher Admin-Code";
+        }
+    }
+
+    private void LogoutAdmin()
+    {
+        IsAdmin = false;
+        Nav.NavigateTo("/");
+    }
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            LoginAdmin();
+        }
+    }
+}

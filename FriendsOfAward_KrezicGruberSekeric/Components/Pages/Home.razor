@@ -1,7 +1,9 @@
 ﻿@page "/vote/{token}"
 @rendermode InteractiveServer
+@inject NavigationManager Nav
 
-<PageTitle>Home</PageTitle>
+<button class="admin-btn" @onclick="Btn_GoToAdmin">Admin-Login</button>
+
 <div class="legende">
     <h1>Friends of Award</h1>
     <h3>Geben Sie uns Ihre persönlichen Favoriten!</h3>
@@ -34,6 +36,11 @@
 
     private List<(int, int)> ButtonsList = new(); //Buttonname, vote, topvote
 
+    void Btn_GoToAdmin()
+    {
+        Nav.NavigateTo("/admin");
+    }
+    
     protected override void OnInitialized()
     {
         for (int i = 1; i <= count; i++)
