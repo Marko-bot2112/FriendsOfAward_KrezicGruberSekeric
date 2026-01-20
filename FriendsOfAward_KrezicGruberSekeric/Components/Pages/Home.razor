@@ -1,14 +1,106 @@
-﻿@page "/"
+﻿@page "/vote/{token}"
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 
-<button @onclick="Btn_GoToAdmin">
-    Zum Admin-Bereich
-</button>
+<button class="admin-btn" @onclick="Btn_GoToAdmin">Admin-Login</button>
+
+<div class="legende">
+    <h1>Friends of Award</h1>
+    <h3>Geben Sie uns Ihre persönlichen Favoriten!</h3>
+    <h3>Einfacher Klick: Favorit (Maximal 5)</h3>
+    <h3>Doppelklick: Topfavorit (Maximal 1)</h3>
+    <p class="small-note">Diese Abstimmung ist anonym und auf ein Gerät beschränkt.</p>
+    <button @onclick="Btn_ResetAll">Gesamte Auswahl Löschen</button>
+
+    <div class="button_grid">
+        @foreach (var button in ButtonsList)
+        {
+            <button @onclick="() => Btn_OnClick(button)" class="@(button.Item2 == 1 ? "favorit" : button.Item2 == 2 ? "topfavorit" : "")">@button.Item1.ToString()</button>            
+        }
+        
+    </div>
+    
+    <p>Offen: @maxfavoriten Favoriten, @maxtopfavorit Topfavorit</p>
+
+    <button @onclick="Btn_BewertungAbschicken">Bewertung Absenden</button>
+</div>
 
 @code {
+    [Parameter]
+    public string token { get; set; } = "";
+
+    private int count = 20;
+    private int maxfavoriten = 5;
+    private int maxtopfavorit = 1;
+    private string styleClass = "";
+
+    private List<(int, int)> ButtonsList = new(); //Buttonname, vote, topvote
+
     void Btn_GoToAdmin()
     {
         Nav.NavigateTo("/admin");
+    }
+    
+    protected override void OnInitialized()
+    {
+        for (int i = 1; i <= count; i++)
+        {
+            var button = (i, 0);
+            ButtonsList.Add(button);
+        }
+    }
+
+    private void Btn_OnClick((int,int) btn)
+    {
+        var idx = ButtonsList.FindIndex(b => b.Item1 == btn.Item1);
+
+        switch (btn.Item2)
+        {
+            case 0:
+                if (maxfavoriten > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 1);
+                    maxfavoriten--;
+                }
+                else if (maxtopfavorit > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 2);
+                    maxtopfavorit--;
+                }
+                break;
+
+            case 1:
+                if (maxtopfavorit > 0)
+                {
+                    ButtonsList[idx] = (btn.Item1, 2);
+                    maxtopfavorit--;
+                    maxfavoriten++; 
+                }
+                else
+                {
+                    ButtonsList[idx] = (btn.Item1, 0);
+                    maxfavoriten++;
+                }
+                break;
+
+            case 2:
+                ButtonsList[idx] = (btn.Item1, 0);
+                maxtopfavorit++;
+                break;
+        }
+    }
+
+    private void Btn_BewertungAbschicken()
+    {
+        List<(int, int)> Votes = new();
+        foreach (var item in ButtonsList)
+        {
+            if (item.Item2 != 0) Votes.Add(item);
+        }
+    }
+
+    private void Btn_ResetAll()
+    {
+        
     }
 }
