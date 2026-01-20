@@ -1,4 +1,5 @@
-﻿using FriendsOfAward_KrezicGruberSekeric.Components;
+﻿using Blazored.Toast;
+using FriendsOfAward_KrezicGruberSekeric.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,10 @@ builder.Services.AddDistributedMemoryCache();
 
 // Register session after the cache
 builder.Services.AddSession();
+
+
+// Blazored Toast
+builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
 
