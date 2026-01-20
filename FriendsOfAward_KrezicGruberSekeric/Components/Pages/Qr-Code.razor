@@ -7,8 +7,11 @@
             Scanne den Code und Vote für die beste Diplomarbeit in deinen Augen
         </p>
         <button class="qr-button" @onclick="CreateQrCode">Generate</button>
-        <img class="qr-image" src="@QrCodeImg" alt="" />
 
+        @if (!string.IsNullOrEmpty(QrCodeImg))
+        {
+            <img class="qr-image" src="@QrCodeImg" alt="" />
+        }
         <span>@message</span>
     </div>
 </div>
