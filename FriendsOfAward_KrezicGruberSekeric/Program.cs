@@ -2,6 +2,7 @@
 using FriendsOfAward_KrezicGruberSekeric.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,16 +10,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.Cookie.Name = "auth_token";
-        options.Cookie.Path = "/login";
-        options.Cookie.MaxAge = TimeSpan.FromMinutes(10);
-        options.AccessDeniedPath = "/access-denied";
+        options.LoginPath = "/login";
     });
+
 builder.Services.AddAuthorization();
+
 builder.Services.AddCascadingAuthenticationState();
+
+// In Program.cs, add this line after AddCascadingAuthenticationState():
+builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
 
 // Register a distributed cache (in-memory for single-server dev)
 builder.Services.AddDistributedMemoryCache();
@@ -26,6 +31,7 @@ builder.Services.AddDistributedMemoryCache();
 // Register session after the cache
 builder.Services.AddSession();
 
+builder.Services.AddHttpContextAccessor();
 
 // Blazored Toast
 builder.Services.AddBlazoredToast();

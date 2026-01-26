@@ -1,4 +1,6 @@
 ﻿@page "/admin"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "admin")]
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 

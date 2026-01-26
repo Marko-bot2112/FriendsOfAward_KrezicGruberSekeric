@@ -1,8 +1,10 @@
 ﻿@page "/login"
+@rendermode InteractiveServer
 @using FriendsOfAward_KrezicGruberSekeric.Components.Viewmodel
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Authentication.Cookies
+@inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager navMgr
 
 <div class="row">
@@ -35,7 +37,6 @@
     [CascadingParameter]
     public HttpContent? HttpContent { get; set; }
 
-    [SupplyParameterFromForm]
     public LoginViewModel Model { get; set; } = new();
 
     private string? errorMessage;
@@ -65,9 +66,19 @@
             new Claim(ClaimTypes.Role, "admin")
         };
 
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var identity = new ClaimsIdentity(
+            claims,
+            CookieAuthenticationDefaults.AuthenticationScheme
+        );
+
         var principal = new ClaimsPrincipal(identity);
 
-        navMgr.NavigateTo("/admin");
+        await HttpContextAccessor.HttpContext!.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal
+        );
+
+        // IMPORTANT
+        navMgr.NavigateTo("/admin", forceLoad: true);   
     }
 }
