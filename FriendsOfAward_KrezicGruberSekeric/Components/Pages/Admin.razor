@@ -1,5 +1,6 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
+@inject IJSRuntime JS
 
 <div class="admin-grid">
 
@@ -130,11 +131,102 @@
     private void btn_startVote() { }
     private void btn_stopVote() { }
     private void btn_deleteAllReviews() { }
-    private void btn_qrcodesgenerate(int count)
+
+    List<string> QrCodeList;
+    private async void btn_qrcodesgenerate(int count)
     {
-        
-    
+        // 1️⃣ QR-Codes erzeugen
+        var qrCodes = GenerateQrCodes(count); // Anzahl beliebig
+
+        // 2️⃣ HTML bauen (DEINE Methode)
+        var html = BuildHtml(qrCodes);
+
+        // 3️⃣ Download starten
+        await JS.InvokeVoidAsync("downloadHtmlFile", "qrcodes.html", html);
     }
+    List<string> GenerateQrCodes(int count)
+    {
+        var result = new List<string>();
+
+        for (int i = 0; i < count; i++)
+        {
+            var token = Guid.NewGuid().ToString();
+            var payload = $"https://172.17.10.51:5432/validation/{token}";
+
+            using var generator = new QRCoder.QRCodeGenerator();
+            using var data = generator.CreateQrCode(payload, QRCoder.QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCoder.PngByteQRCode(data);
+
+            var bytes = qrCode.GetGraphic(20);
+            var base64 = Convert.ToBase64String(bytes);
+
+            result.Add($"data:image/png;base64,{base64}");
+        }
+
+        return result;
+    }
+    string BuildHtml(List<string> qrCodes)
+    {
+        var sb = new System.Text.StringBuilder();
+
+        sb.AppendLine("<!DOCTYPE html>");
+        sb.AppendLine("<html lang=\"de\">");
+        sb.AppendLine("<head>");
+        sb.AppendLine("  <meta charset=\"UTF-8\">");
+        sb.AppendLine("  <title>QR Codes</title>");
+        sb.AppendLine("  <style>");
+        sb.AppendLine("    body { font-family: Arial; text-align: center; margin-top: 40px; }");
+        sb.AppendLine("    img { width: 300px; height: 300px; }");
+        sb.AppendLine("    button { padding: 10px 20px; margin: 10px; font-size: 16px; }");
+        sb.AppendLine("  </style>");
+        sb.AppendLine("</head>");
+        sb.AppendLine("<body>");
+
+        sb.AppendLine($"  <h2>QR Code <span id=\"index\">1</span> / {qrCodes.Count}</h2>");
+        sb.AppendLine("  <img id=\"qrImage\" src=\"\" />");
+
+        sb.AppendLine("  <div>");
+        sb.AppendLine("    <button onclick=\"prev()\">⬅ Vorher</button>");
+        sb.AppendLine("    <button onclick=\"next()\">Nachher ➡</button>");
+        sb.AppendLine("  </div>");
+
+        // --- JavaScript ---
+        sb.AppendLine("  <script>");
+        sb.AppendLine("    const images = [");
+
+        for (int i = 0; i < qrCodes.Count; i++)
+        {
+            var comma = i < qrCodes.Count - 1 ? "," : "";
+            sb.AppendLine($"      \"{qrCodes[i]}\"{comma}");
+        }
+
+        sb.AppendLine("    ];");
+        sb.AppendLine("    let current = 0;");
+        sb.AppendLine("    const img = document.getElementById(\"qrImage\");");
+        sb.AppendLine("    const indexLabel = document.getElementById(\"index\");");
+
+        sb.AppendLine("    function update() {");
+        sb.AppendLine("      img.src = images[current];");
+        sb.AppendLine("      indexLabel.innerText = current + 1;");
+        sb.AppendLine("    }");
+
+        sb.AppendLine("    function next() {");
+        sb.AppendLine("      if (current < images.length - 1) { current++; update(); }");
+        sb.AppendLine("    }");
+
+        sb.AppendLine("    function prev() {");
+        sb.AppendLine("      if (current > 0) { current--; update(); }");
+        sb.AppendLine("    }");
+
+        sb.AppendLine("    update();");
+        sb.AppendLine("  </script>");
+
+        sb.AppendLine("</body>");
+        sb.AppendLine("</html>");
+
+        return sb.ToString();
+    }
+
     private void btn_changePassword() { }
     private void btn_excelExportOptions() { }
 }
