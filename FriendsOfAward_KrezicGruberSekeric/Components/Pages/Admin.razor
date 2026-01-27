@@ -4,9 +4,6 @@
 @inject Blazored.Toast.Services.IToastService toastService
 
 <BlazoredToasts></BlazoredToasts>
-    <Authorized>
-        <div class="login-bg">
-            <div class="login-wrapper">
 
 <div class="admin-grid">
 
@@ -99,20 +96,15 @@
                     <button class="detail-button" @onclick="btn_changePassword">
                         Passwort ändern
                     </button>
-                        } *@
-                    <button type="button" onclick="@Btn_Logout">Logout</button>
                 </div>
             }
                 
         </div>
             
     </div>
-    </Authorized>
 
 }
-
-
-    </NotAuthorized>
+@code {
     private int qrCode_count = 1;
     private string error;
     private bool IsAdmin = false;
