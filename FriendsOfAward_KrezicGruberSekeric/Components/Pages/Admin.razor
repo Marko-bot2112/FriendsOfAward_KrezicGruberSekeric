@@ -107,15 +107,12 @@
 }
 @code {
     private int qrCode_count = 1;
-    private string error;
-    private bool IsAdmin = false;
 
     private AdminSection activeSection = AdminSection.None;
 
     private void SelectSection(AdminSection section)
     {
         activeSection = section;
-            error = null;
     }
 
     private string GetSectionTitle() => activeSection switch
