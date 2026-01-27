@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 @inject Blazored.Toast.Services.IToastService toastService
+@using Microsoft.AspNetCore.Components.Authorization
 
 <BlazoredToasts></BlazoredToasts>
 
@@ -75,10 +76,10 @@
                         Generieren
                     </button>
                 </div>
-            }
+                        }
 
             @if (activeSection == AdminSection.Excel)
-            {
+                        {
                 <div class="detail-card orange">
                     <h3>Excel Export</h3>
                     <p>Exportiert alle Daten als Excel-Datei.</p>
@@ -98,21 +99,23 @@
                     </button>
                 </div>
             }
-
+                
         </div>
+            
     </div>
 
 }
-
-
 @code {
     private int qrCode_count = 1;
+    private string error;
+    private bool IsAdmin = false;
 
     private AdminSection activeSection = AdminSection.None;
 
     private void SelectSection(AdminSection section)
     {
         activeSection = section;
+            error = null;
     }
 
     private string GetSectionTitle() => activeSection switch

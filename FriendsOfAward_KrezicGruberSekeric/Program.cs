@@ -9,22 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "auth_token";
-        options.Cookie.Path = "/login";
-        options.Cookie.MaxAge = TimeSpan.FromMinutes(10);
-        options.AccessDeniedPath = "/access-denied";
-    });
+
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
 // Register a distributed cache (in-memory for single-server dev)
 builder.Services.AddDistributedMemoryCache();
 
-// Register session after the cache
-builder.Services.AddSession();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddAuthorization();
 
 
 // Blazored Toast
