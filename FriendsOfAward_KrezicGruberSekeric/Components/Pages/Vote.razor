@@ -1,6 +1,6 @@
 ﻿@page "/vote/{token}"
 @rendermode InteractiveServer
-@inject NavigationManager Nav
+@inject NavigationManager nav
 
 <button class="admin-btn" @onclick="Btn_GoToAdmin">Admin-Login</button>
 
@@ -23,30 +23,46 @@
     <p>Offen: @maxfavoriten Favoriten, @maxtopfavorit Topfavorit</p>
 
     <button @onclick="Btn_BewertungAbschicken">Bewertung Absenden</button>
+
+    @if (message.Length > 0)
+    {
+        <p>
+            <span class="error">@message</span>
+        </p>
+    }
+    
 </div>
 
 @code {
     [Parameter]
     public string token { get; set; } = "";
 
-    private int count = 20;
+    
     private int maxfavoriten = 5;
     private int maxtopfavorit = 1;
     private string styleClass = "";
+    private string message = "";
 
     private List<(int, int)> ButtonsList = new(); //Buttonname, vote, topvote
 
     void Btn_GoToAdmin()
     {
-        Nav.NavigateTo("/admin");
+        nav.NavigateTo("/admin");
     }
-    
+
     protected override void OnInitialized()
     {
-        for (int i = 1; i <= count; i++)
+        DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+        string sqlCmd = $"SELECT COUNT(*) FROM foa_diplomarbeiten;";
+        DataTable dt = wrappr.RunQuery(sqlCmd);
+        foreach (DataRow item in dt.Rows)
         {
-            var button = (i, 0);
-            ButtonsList.Add(button);
+            int nrDiplomarbeiten = Convert.ToInt16(item[0]);
+            for (int i = 1; i <= nrDiplomarbeiten; i++)
+            {
+                var button = (i, 0);
+                ButtonsList.Add(button);
+            }
         }
     }
 
@@ -92,11 +108,54 @@
 
     private void Btn_BewertungAbschicken()
     {
+        // Check if token already used
+        DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+        string sqlCmd = $"SELECT used FROM foa_tokens WHERE token = '{token}'";
+        DataTable dt = wrappr.RunQuery(sqlCmd);
+        foreach (DataRow item in dt.Rows)
+        {
+            if (Convert.ToInt16(item[0]) == 1)
+            {
+                message = "Mit dem Qr-Code wurde bereits abgestimmt! Wenden Sie sich an den System-Administrator: Alfredino Capuccino";
+                return;
+            }
+        }
+
         List<(int, int)> Votes = new();
         foreach (var item in ButtonsList)
         {
             if (item.Item2 != 0) Votes.Add(item);
         }
+
+        try
+        {
+            foreach (var item in Votes)
+            {
+                if(item.Item2 == 1)
+                {
+                    sqlCmd = $"UPDATE foa_diplomarbeiten SET stimmen = stimmen + 1 WHERE id = {item.Item1}";
+                }
+                else // Topfavorit
+                {
+                    sqlCmd = $"UPDATE foa_diplomarbeiten SET stimmen = stimmen + 2 WHERE id = {item.Item1}";
+                }
+
+                wrappr.RunQuery(sqlCmd);
+            }
+
+            if(Votes.Count != 0)
+            {
+                sqlCmd = $"UPDATE foa_tokens SET used = 1 WHERE token = '{token}'";
+                wrappr.RunQuery(sqlCmd);
+            }
+
+        }
+        catch (Exception ex)
+        {
+
+        }
+
+        message = "Sie haben erfolgreich abgestimmt!";
     }
 
     private void Btn_ResetAll()
