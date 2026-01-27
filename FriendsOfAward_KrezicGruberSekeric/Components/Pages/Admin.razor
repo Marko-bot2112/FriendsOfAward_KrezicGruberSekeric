@@ -1,5 +1,9 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
+@inject NavigationManager Nav
+@inject Blazored.Toast.Services.IToastService toastService
+
+<BlazoredToasts></BlazoredToasts>
 
 <div class="admin-grid">
 
@@ -97,7 +101,9 @@
 
         </div>
     </div>
+
 }
+
 
 @code {
     private int qrCode_count = 1;
@@ -127,14 +133,26 @@
         Security
     }
 
-    private void btn_startVote() { }
-    private void btn_stopVote() { }
-    private void btn_deleteAllReviews() { }
+    private void btn_startVote()
+    {
+        toastService.ShowInfo("Abstimmumng starten ist noch nicht implementiert.");
+    }
+    private void btn_stopVote()
+    {
+        toastService.ShowInfo("Abstimmung stoppen ist noch nicht implementiert.");
+    }
+    private void btn_deleteAllReviews()
+    {
+        toastService.ShowWarning("Alle Bewertungen löschen ist noch nicht implementiert.");
+    }
     private void btn_qrcodesgenerate(int count)
     {
-        
-    
+
+
     }
-    private void btn_changePassword() { }
+    private void btn_changePassword()
+    {
+        toastService.ShowInfo("Passwort ändern ist noch nicht implementiert.");
+    }
     private void btn_excelExportOptions() { }
 }
