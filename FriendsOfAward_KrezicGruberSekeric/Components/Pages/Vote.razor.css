@@ -56,14 +56,24 @@
 }
 
 .favorit {
-    background: #ffe066;
+    background: #4caf50;
     color: #5c4b00;
 }
 
 .topfavorit {
-    background: #4caf50;
+    position: relative;
+    background: #ffe066;
     color: white;
 }
+    .topfavorit::before {
+        content: "👑";
+        position: absolute;
+        top: -14px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 22px;
+        pointer-events: none;
+    }
 
 button {
     height: 64px;
