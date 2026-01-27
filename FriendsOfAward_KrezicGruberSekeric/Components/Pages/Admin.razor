@@ -12,48 +12,49 @@
                 </div>
 
                 <div class="login-card">
-                    <h2>Admin Login</h2>
+                    <h2>Admin Page</h2>
 
-                    @* @if (!IsAdmin)
-            {
-                <input type="password"
-                       placeholder="Admin-Code"
-                       @bind="adminCode"
-                       @onkeydown="HandleKeyDown" />
+                    @* @if (!IsAdmin) {
+                            <input type="password"
+                            placeholder="Admin-Code"
+                            @bind="adminCode"
+                            @onkeydown="HandleKeyDown" />
 
-                @if (!string.IsNullOrEmpty(error))
-                {
-                    <p class="error">@error</p>
-                }
+                       @if (!string.IsNullOrEmpty(error))
+                       {
+                            <p class="error">@error</p>
+                       }
 
-                <button class="login-btn" @onclick="LoginAdmin">
-                    LOGIN
-                </button>
-            }
-            else
-            {
-                <p class="success">🔐 Eingeloggt</p>
+                        <button class="login-btn" @onclick="LoginAdmin">
+                        LOGIN
+                        </button>
+                        }
+                        else
+                        {
+                            <p class="success">🔐 Eingeloggt</p>
 
-                <button class="logout-btn" @onclick="LogoutAdmin">
-                    Logout
-                </button>
-            } *@
+                            <button class="logout-btn" @onclick="LogoutAdmin">
+                                Logout
+                            </button>
+                        } *@
+                    <button type="button" onclick="@Btn_Logout">Logout</button>
                 </div>
-
+                
             </div>
+            
         </div>
     </Authorized>
 
     <NotAuthorized>
         <h3 style="color: red">Sie sind nicht eingeloggt.</h3>
-        <button @onclick="Btn_Login">Loggen Sie sich ein</button>
+        <button @onclick="Btn_Logout">Loggen Sie sich ein</button>
     </NotAuthorized>
 </Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
 
 
 @code {
 
-    private void Btn_Login()
+    private void Btn_Logout()
     {
         Nav.NavigateTo("/login");
     }

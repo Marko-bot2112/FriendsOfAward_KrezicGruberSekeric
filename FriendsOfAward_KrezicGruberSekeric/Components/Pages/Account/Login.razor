@@ -7,33 +7,25 @@
 @inject NavigationManager navMgr
 @inject MyCustomAuthStateProvider MyAuthProvider
 
-<form @onsubmit="Authenticate" @onsubmit:preventDefault>
     <div>
-        <label>Benutzername:</label>
-        <input @bind="username" />
+        <label for="username">Benutzername:</label>
+        <input id="username" @bind="username" />
     </div>
-
     <div>
-        <label>Passwort:</label>
-        <input type="password" @bind="password" />
+        <label for="password">Passwort:</label>
+        <input id="password" type="password" @bind="password" />
     </div>
-
-    <button type="submit">Login</button>
-</form>
-
-@if (!string.IsNullOrEmpty(errormessage))
-{
-    <p style="color:red">@errormessage</p>
-}
+    <button type="button" @onclick="Authenticate">Anmelden</button>
+    <p style="color: red">@errormessage</p>
 
 @code {
-    string username = "";
+    string username = ""; 
     string password = "";
     string errormessage = "";
 
     void Authenticate()
     {
-        if (IsValidUser(username, password))
+        if(IsValidUser(username, password))
         {
             MyAuthProvider.Login(username);
             navMgr.NavigateTo("/admin");
@@ -43,16 +35,13 @@
             errormessage = "Ungültiger Benutzername oder Passwort.";
         }
     }
-
     bool IsValidUser(string username, string password)
     {
+        Custom_Library.DbWrapperMySqlV2 wrappr = Custom_Library.DbWrapperMySqlV2.Wrapper;
         try
         {
-            var wrappr = Custom_Library.DbWrapperMySqlV2.Wrapper;
-            string sqlCmd =
-                $"SELECT email FROM foa_admin WHERE email = '{username}' AND passwort = '{password}'";
-
-            var dt = wrappr.RunQuery(sqlCmd);
+            string sqlCmd = $"SELECT email, passwort FROM foa_admin WHERE email = '{username}' AND passwort = '{password}'";
+            DataTable dt = wrappr.RunQuery(sqlCmd);
             return dt.Rows.Count > 0;
         }
         catch (Exception ex)
@@ -60,5 +49,6 @@
             errormessage = ex.Message;
             return false;
         }
+        
     }
 }
