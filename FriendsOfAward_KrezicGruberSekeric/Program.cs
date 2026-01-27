@@ -9,14 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "auth_token";
-        options.Cookie.Path = "/login";
-        options.Cookie.MaxAge = TimeSpan.FromMinutes(10);
-        options.AccessDeniedPath = "/access-denied";
-    });
+
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
