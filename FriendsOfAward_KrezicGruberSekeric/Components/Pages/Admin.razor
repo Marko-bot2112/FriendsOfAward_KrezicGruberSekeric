@@ -1,61 +1,168 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
 @inject NavigationManager Nav
+@inject Blazored.Toast.Services.IToastService toastService
 
-<Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+<BlazoredToasts></BlazoredToasts>
     <Authorized>
         <div class="login-bg">
             <div class="login-wrapper">
 
-                <div class="login-avatar">
-                    👤
+<div class="admin-grid">
+
+    <div class="admin-tile blue" @onclick="() => SelectSection(AdminSection.Vote)">
+        <h2>Abstimmung</h2>
+        <p>Starten / Stoppen / Zurücksetzen</p>
+    </div>
+
+    <div class="admin-tile green" @onclick="() => SelectSection(AdminSection.QR)">
+        <h2>QR-Codes</h2>
+        <p>Codes generieren</p>
+    </div>
+
+    <div class="admin-tile orange" @onclick="() => SelectSection(AdminSection.Excel)">
+        <h2>Excel Export</h2>
+        <p>Export Optionen</p>
+    </div>
+
+    <div class="admin-tile red" @onclick="() => SelectSection(AdminSection.Security)">
+        <h2>Sicherheit</h2>
+        <p>Passwort ändern</p>
+    </div>
+
+</div>
+
+@if (activeSection != AdminSection.None)
+{
+    <div class="admin-content">
+
+        <h2 class="section-title">@GetSectionTitle()</h2>
+
+        <div class="detail-grid">
+
+            @if (activeSection == AdminSection.Vote)
+            {
+                <div class="detail-card blue">
+                    <h3>Abstimmung starten</h3>
+                    <p>Öffnet die Abstimmung für alle Teilnehmer.</p>
+                    <button class="detail-button" @onclick="btn_startVote">Starten</button>
                 </div>
 
-                <div class="login-card">
-                    <h2>Admin Page</h2>
+                <div class="detail-card blue">
+                    <h3>Abstimmung stoppen</h3>
+                    <p>Beendet die laufende Abstimmung.</p>
+                    <button class="detail-button" @onclick="btn_stopVote">Stoppen</button>
+                </div>
 
-                    @* @if (!IsAdmin) {
-                            <input type="password"
-                            placeholder="Admin-Code"
-                            @bind="adminCode"
-                            @onkeydown="HandleKeyDown" />
+                <div class="detail-card danger">
+                    <h3>Alle Bewertungen löschen</h3>
+                    <p>⚠️ Diese Aktion kann nicht rückgängig gemacht werden.</p>
+                    <button class="detail-button danger" @onclick="btn_deleteAllReviews">
+                        Löschen
+                    </button>
+                </div>
+            }
 
-                       @if (!string.IsNullOrEmpty(error))
-                       {
-                            <p class="error">@error</p>
-                       }
+            @if (activeSection == AdminSection.QR)
+            {
+                <div class="detail-card green">
+                    <h3>QR-Codes generieren</h3>
+                    <p>Anzahl der zu erstellenden QR-Codes</p>
 
-                        <button class="login-btn" @onclick="LoginAdmin">
-                        LOGIN
-                        </button>
+                    <input class="qr-input"
+                           type="number"
+                           min="1"
+                           @bind="qrCode_count" />
+
+                    <button class="detail-button" @onclick="() => btn_qrcodesgenerate(qrCode_count)">
+                        Generieren
+                    </button>
+                </div>
                         }
-                        else
-                        {
-                            <p class="success">🔐 Eingeloggt</p>
 
-                            <button class="logout-btn" @onclick="LogoutAdmin">
-                                Logout
-                            </button>
+            @if (activeSection == AdminSection.Excel)
+                        {
+                <div class="detail-card orange">
+                    <h3>Excel Export</h3>
+                    <p>Exportiert alle Daten als Excel-Datei.</p>
+                    <button class="detail-button" @onclick="btn_excelExportOptions">
+                        Export starten
+                    </button>
+                </div>
+            }
+
+            @if (activeSection == AdminSection.Security)
+            {
+                <div class="detail-card red">
+                    <h3>Passwort ändern</h3>
+                    <p>Aus Sicherheitsgründen regelmäßig ändern.</p>
+                    <button class="detail-button" @onclick="btn_changePassword">
+                        Passwort ändern
+                    </button>
                         } *@
                     <button type="button" onclick="@Btn_Logout">Logout</button>
                 </div>
+            }
                 
-            </div>
-            
         </div>
+            
+    </div>
     </Authorized>
 
-    <NotAuthorized>
-        <h3 style="color: red">Sie sind nicht eingeloggt.</h3>
-        <button @onclick="Btn_Logout">Loggen Sie sich ein</button>
+}
+
+
     </NotAuthorized>
-</Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+    private int qrCode_count = 1;
+    private string error;
+    private bool IsAdmin = false;
 
+    private AdminSection activeSection = AdminSection.None;
 
-@code {
-
-    private void Btn_Logout()
+    private void SelectSection(AdminSection section)
     {
-        Nav.NavigateTo("/login");
+        activeSection = section;
+            error = null;
     }
+
+    private string GetSectionTitle() => activeSection switch
+    {
+        AdminSection.Vote => "Abstimmung verwalten",
+        AdminSection.QR => "QR-Codes",
+        AdminSection.Excel => "Excel Export",
+        AdminSection.Security => "Sicherheit",
+        _ => ""
+    };
+
+    enum AdminSection
+    {
+        None,
+        Vote,
+        QR,
+        Excel,
+        Security
+    }
+
+    private void btn_startVote()
+    {
+        toastService.ShowInfo("Abstimmumng starten ist noch nicht implementiert.");
+    }
+    private void btn_stopVote()
+    {
+        toastService.ShowInfo("Abstimmung stoppen ist noch nicht implementiert.");
+    }
+    private void btn_deleteAllReviews()
+    {
+        toastService.ShowWarning("Alle Bewertungen löschen ist noch nicht implementiert.");
+    }
+    private void btn_qrcodesgenerate(int count)
+    {
+
+
+    }
+    private void btn_changePassword()
+    {
+        toastService.ShowInfo("Passwort ändern ist noch nicht implementiert.");
+    }
+    private void btn_excelExportOptions() { }
 }
