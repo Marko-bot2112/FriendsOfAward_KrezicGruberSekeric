@@ -2,17 +2,19 @@
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 
-<div class="login-bg">
-    <div class="login-wrapper">
+<Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+    <Authorized>
+        <div class="login-bg">
+            <div class="login-wrapper">
 
-        <div class="login-avatar">
-            👤
-        </div>
+                <div class="login-avatar">
+                    👤
+                </div>
 
-        <div class="login-card">
-            <h2>Admin Login</h2>
+                <div class="login-card">
+                    <h2>Admin Login</h2>
 
-            @* @if (!IsAdmin)
+                    @* @if (!IsAdmin)
             {
                 <input type="password"
                        placeholder="Admin-Code"
@@ -36,40 +38,23 @@
                     Logout
                 </button>
             } *@
-        </div>
+                </div>
 
-    </div>
-</div>
+            </div>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <h3 style="color: red">Sie sind nicht eingeloggt.</h3>
+        <button @onclick="Btn_Login">Loggen Sie sich ein</button>
+    </NotAuthorized>
+</Microsoft.AspNetCore.Components.Authorization.AuthorizeView>
+
 
 @code {
-    private string adminCode;
-    private string error;
-    private bool IsAdmin = false;
 
-    private void LoginAdmin()
+    private void Btn_Login()
     {
-        if (adminCode == "1234")
-        {
-            IsAdmin = true;
-            error = null;
-        }
-        else
-        {
-            error = "Falscher Admin-Code";
-        }
-    }
-
-    private void LogoutAdmin()
-    {
-        IsAdmin = false;
-        Nav.NavigateTo("/");
-    }
-
-    private void HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            LoginAdmin();
-        }
+        Nav.NavigateTo("/login");
     }
 }
