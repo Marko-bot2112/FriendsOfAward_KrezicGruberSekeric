@@ -25,8 +25,6 @@ builder.Services.AddBlazoredToast();
 
 var app = builder.Build();
 
-app.UseSession(); // enable session middleware
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -39,8 +37,6 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
