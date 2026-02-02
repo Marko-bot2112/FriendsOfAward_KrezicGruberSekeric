@@ -294,21 +294,44 @@
         using var workbook = new XLWorkbook(memoryStream);
         var worksheet = workbook.Worksheet(1); // erstes Tabellenblatt
 
-        foreach (var row in worksheet.RowsUsed())
+        var daten = new List<dynamic>();
+
+        foreach (var row in worksheet.RowsUsed().Skip(1))
         {
-            var rowData = new List<string>();
-            foreach (var cell in row.CellsUsed())
+            daten.Add(new
             {
-                rowData.Add(cell.GetValue<string>());
-            }
-            rows.Add(rowData);
+                Nr = row.Cell(1).GetValue<int>(),
+                Titel = row.Cell(2).GetString(),
+                Autor = row.Cell(3).GetString()
+            });
         }
     }
     private void btn_ImportExcel()
     {
-        
-        string sql = $"INSERT INTO foa_diplomarbeiten VALUES (@Nr, @Titel, @Autor)";
-        
+        string error = "";
+        DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+        string sql = $"INSERT INTO foa_diplomarbeiten VALUES ({Nr}, {@Titel}, {@Autor})";
+        try
+        {
+           foreach (var item in daten)
+        {
+            string titel = MySqlHelper.EscapeString(item.Titel);
+            string autor = MySqlHelper.EscapeString(item.Autor);
+
+            string sql = $@"
+                INSERT INTO foa_diplomarbeiten (nr, titel, autor)
+                VALUES ({item.Nr}, '{titel}', '{autor}');
+            ";
+
+            wrappr.RunNonQuery(sql);
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+        }
+
 
     }
 
