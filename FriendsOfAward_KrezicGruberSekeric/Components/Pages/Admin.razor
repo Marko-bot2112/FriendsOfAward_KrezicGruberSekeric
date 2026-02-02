@@ -3,6 +3,7 @@
 @inject IJSRuntime JS
 @inject Blazored.Toast.Services.IToastService toastService
 @using Microsoft.AspNetCore.Components.Authorization
+@using ClosedXML.Excel
 
 <BlazoredToasts></BlazoredToasts>
 
@@ -87,6 +88,15 @@
                         Export starten
                     </button>
                 </div>
+                <div class="detail-card orange">
+                    <h3>Excel Export</h3>
+                    <p>Importieren von Excel Datei aller Diplomarbeiten.</p>
+                    <InputFile OnChange="OnFileSelected"
+                               accept=".xlsx,.xls" />
+                    <button class="detail-button" @onclick="btn_ImportExcel">
+                        Importieren Starten
+                    </button>
+                </div>
             }
 
             @if (activeSection == AdminSection.Security)
@@ -102,6 +112,21 @@
                 
         </div>  
     </div>
+
+    @if (rows.Any())
+    {
+        <table class="table">
+            @foreach (var row in rows)
+            {
+                <tr>
+                    @foreach (var cell in row)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </table>
+    }
 }
 @code {
     private int qrCode_count = 1;
@@ -143,6 +168,11 @@
     {
         toastService.ShowWarning("Alle Bewertungen löschen ist noch nicht implementiert.");
     }
+    private void btn_changePassword()
+    {
+        toastService.ShowInfo("Passwort ändern ist noch nicht implementiert.");
+    }
+
     List<string> QrCodeList;
     private async void btn_qrcodesgenerate(int count)
     {
@@ -237,9 +267,50 @@
 
         return sb.ToString();
     }
-    private void btn_changePassword()
+
+
+    private List<List<string>> rows = new();
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        toastService.ShowInfo("Passwort ändern ist noch nicht implementiert.");
+        IBrowserFile file = e.File;
+
+        // Validierung (optional, aber empfohlen)
+        var extension = Path.GetExtension(file.Name).ToLower();
+        if (extension != ".xlsx" && extension != ".xls" && extension != ".xlsm")
+        {
+            Console.WriteLine("Keine Excel-Datei!");
+            return;
+        }
+
+        Console.WriteLine($"Datei: {file.Name}");
+        Console.WriteLine($"Größe: {file.Size} Bytes");
+
+        // Beispiel: Datei lesen
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10 MB
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+
+        using var workbook = new XLWorkbook(memoryStream);
+        var worksheet = workbook.Worksheet(1); // erstes Tabellenblatt
+
+        foreach (var row in worksheet.RowsUsed())
+        {
+            var rowData = new List<string>();
+            foreach (var cell in row.CellsUsed())
+            {
+                rowData.Add(cell.GetValue<string>());
+            }
+            rows.Add(rowData);
+        }
     }
+    private void btn_ImportExcel()
+    {
+        
+        string sql = $"INSERT INTO foa_diplomarbeiten VALUES (@Nr, @Titel, @Autor)";
+        
+
+    }
+
     private void btn_excelExportOptions() { }
 }
