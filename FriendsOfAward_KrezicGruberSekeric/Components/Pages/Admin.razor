@@ -2,8 +2,11 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JS
 @inject Blazored.Toast.Services.IToastService toastService
+@using DocumentFormat.OpenXml.Office.CustomUI
+@using FriendsOfAward_KrezicGruberSekeric.Components.Pages.Account
 @using Microsoft.AspNetCore.Components.Authorization
 @using ClosedXML.Excel
+@using MySql.Data.MySqlClient
 
 <BlazoredToasts></BlazoredToasts>
 
@@ -129,6 +132,9 @@
     }
 }
 @code {
+
+    private List<DiplomarbeitenDto> daten = new();
+
     private int qrCode_count = 1;
 
     private AdminSection activeSection = AdminSection.None;
@@ -308,32 +314,38 @@
     }
     private void btn_ImportExcel()
     {
+        if (!daten.Any())
+        {
+            toastService.ShowWarning("Keine Daten zum Importieren!");
+            return;
+        }
+
         string error = "";
         DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
-        string sql = $"INSERT INTO foa_diplomarbeiten VALUES ({Nr}, {@Titel}, {@Autor})";
         try
         {
-           foreach (var item in daten)
+            foreach (var item in daten)
+            {
+                string titel = MySqlHelper.EscapeString(item.Titel);
+                string autor = MySqlHelper.EscapeString(item.Autor);
+                string sql = $"INSERT INTO foa_diplomarbeiten VALUES ({item.Nr}, '{titel}', '{autor}')";
+
+
+                wrappr.RunNonQuery(sql);
+            }
+            toastService.ShowSuccess("Excel-Daten erfolgreich importiert!");
+        }
+        catch (Exception ex)
         {
-            string titel = MySqlHelper.EscapeString(item.Titel);
-            string autor = MySqlHelper.EscapeString(item.Autor);
-
-            string sql = $@"
-                INSERT INTO foa_diplomarbeiten (nr, titel, autor)
-                VALUES ({item.Nr}, '{titel}', '{autor}');
-            ";
-
-            wrappr.RunNonQuery(sql);
+            toastService.ShowError("Fehler beim Import: " + ex.Message);
         }
+
     }
-    catch (Exception ex)
+
+    private void btn_excelExportOptions() 
     {
-        Console.WriteLine(ex.Message);
-    }
-        }
-
-
+    
     }
 
-    private void btn_excelExportOptions() { }
+    }
 }
