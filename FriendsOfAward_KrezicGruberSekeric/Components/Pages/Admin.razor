@@ -4,6 +4,8 @@
 @inject Blazored.Toast.Services.IToastService toastService
 @inject NavigationManager NavMgr
 @using Microsoft.AspNetCore.Components.Authorization
+@using ClosedXML.Excel
+@using MySql.Data.MySqlClient
 
 <BlazoredToasts></BlazoredToasts>
 <AuthorizeView>
@@ -95,6 +97,15 @@
                         Export starten
                     </button>
                 </div>
+                <div class="detail-card orange">
+                    <h3>Excel Export</h3>
+                    <p>Importieren von Excel Datei aller Diplomarbeiten.</p>
+                    <InputFile OnChange="OnFileSelected"
+                               accept=".xlsx,.xls" />
+                    <button class="detail-button" @onclick="btn_ImportExcel">
+                        Importieren Starten
+                    </button>
+                </div>
             }
 
             @if (activeSection == AdminSection.Security)
@@ -110,8 +121,26 @@
                 
         </div>  
     </div>
+
+    @if (rows.Any())
+    {
+        <table class="table">
+            @foreach (var row in rows)
+            {
+                <tr>
+                    @foreach (var cell in row)
+                    {
+                        <td>@cell</td>
+                    }
+                </tr>
+            }
+        </table>
+    }
 }
 @code {
+
+    private List<DiplomarbeitenDto> daten = new();
+
     private int qrCode_count = 1;
 
     private AdminSection activeSection = AdminSection.None;
@@ -155,6 +184,11 @@
     {
         toastService.ShowWarning("Alle Bewertungen löschen ist noch nicht implementiert.");
     }
+    private void btn_changePassword()
+    {
+        toastService.ShowInfo("Passwort ändern ist noch nicht implementiert.");
+    }
+
     List<string> QrCodeList;
     private async void btn_qrcodesgenerate(int count)
     {
@@ -249,9 +283,78 @@
 
         return sb.ToString();
     }
-    private void btn_changePassword()
+
+
+    private List<List<string>> rows = new();
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        toastService.ShowInfo("Passwort ändern ist noch nicht implementiert.");
+        IBrowserFile file = e.File;
+
+        // Validierung (optional, aber empfohlen)
+        var extension = Path.GetExtension(file.Name).ToLower();
+        if (extension != ".xlsx" && extension != ".xls" && extension != ".xlsm")
+        {
+            Console.WriteLine("Keine Excel-Datei!");
+            return;
+        }
+
+        Console.WriteLine($"Datei: {file.Name}");
+        Console.WriteLine($"Größe: {file.Size} Bytes");
+
+        // Beispiel: Datei lesen
+        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10 MB
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+
+        using var workbook = new XLWorkbook(memoryStream);
+        var worksheet = workbook.Worksheet(1); // erstes Tabellenblatt
+
+        var daten = new List<dynamic>();
+
+        foreach (var row in worksheet.RowsUsed().Skip(1))
+        {
+            daten.Add(new
+            {
+                Nr = row.Cell(1).GetValue<int>(),
+                Titel = row.Cell(2).GetString(),
+                Autor = row.Cell(3).GetString()
+            });
+        }
     }
-    private void btn_excelExportOptions() { }
+    private void btn_ImportExcel()
+    {
+        if (!daten.Any())
+        {
+            toastService.ShowWarning("Keine Daten zum Importieren!");
+            return;
+        }
+
+        string error = "";
+        DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+        try
+        {
+            foreach (var item in daten)
+            {
+                string titel = MySqlHelper.EscapeString(item.Titel);
+                string autor = MySqlHelper.EscapeString(item.Autor);
+                string sql = $"INSERT INTO foa_diplomarbeiten VALUES ({item.Nr}, '{titel}', '{autor}')";
+
+
+                wrappr.RunNonQuery(sql);
+            }
+            toastService.ShowSuccess("Excel-Daten erfolgreich importiert!");
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Fehler beim Import: " + ex.Message);
+        }
+
+    }
+
+    private void btn_excelExportOptions() 
+    {
+    
+    }
+
 }
