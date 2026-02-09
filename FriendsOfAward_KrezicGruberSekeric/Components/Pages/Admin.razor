@@ -2,37 +2,43 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JS
 @inject Blazored.Toast.Services.IToastService toastService
-@using DocumentFormat.OpenXml.Office.CustomUI
-@using FriendsOfAward_KrezicGruberSekeric.Components.Pages.Account
+@inject NavigationManager NavMgr
 @using Microsoft.AspNetCore.Components.Authorization
 @using ClosedXML.Excel
 @using MySql.Data.MySqlClient
 
 <BlazoredToasts></BlazoredToasts>
+<AuthorizeView>
+    <Authorized>
+        <div class="admin-grid">
 
-<div class="admin-grid">
+            <div class="admin-tile blue" @onclick="() => SelectSection(AdminSection.Vote)">
+                <h2>Abstimmung</h2>
+                <p>Starten / Stoppen / Zurücksetzen</p>
+            </div>
 
-    <div class="admin-tile blue" @onclick="() => SelectSection(AdminSection.Vote)">
-        <h2>Abstimmung</h2>
-        <p>Starten / Stoppen / Zurücksetzen</p>
-    </div>
+            <div class="admin-tile green" @onclick="() => SelectSection(AdminSection.QR)">
+                <h2>QR-Codes</h2>
+                <p>Codes generieren</p>
+            </div>
 
-    <div class="admin-tile green" @onclick="() => SelectSection(AdminSection.QR)">
-        <h2>QR-Codes</h2>
-        <p>Codes generieren</p>
-    </div>
+            <div class="admin-tile orange" @onclick="() => SelectSection(AdminSection.Excel)">
+                <h2>Excel Export</h2>
+                <p>Export Optionen</p>
+            </div>
 
-    <div class="admin-tile orange" @onclick="() => SelectSection(AdminSection.Excel)">
-        <h2>Excel Export</h2>
-        <p>Export Optionen</p>
-    </div>
+            <div class="admin-tile red" @onclick="() => SelectSection(AdminSection.Security)">
+                <h2>Sicherheit</h2>
+                <p>Passwort ändern</p>
+            </div>
 
-    <div class="admin-tile red" @onclick="() => SelectSection(AdminSection.Security)">
-        <h2>Sicherheit</h2>
-        <p>Passwort ändern</p>
-    </div>
-
-</div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <p>Bitte loggen Sie sich ein:</p>
+        <button @onclick="Btn_Login">Einloggen</button>
+    </NotAuthorized>
+</AuthorizeView>
 
 @if (activeSection != AdminSection.None)
 {
@@ -160,6 +166,10 @@
         QR,
         Excel,
         Security
+    }
+    private void Btn_Login()
+    {
+        NavMgr.NavigateTo("/login");
     }
 
     private void btn_startVote()
