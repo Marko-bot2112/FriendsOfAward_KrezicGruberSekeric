@@ -1,4 +1,5 @@
 ﻿using Blazored.Toast;
+using FriendsOfAward_KrezicGruberSekeric;
 using FriendsOfAward_KrezicGruberSekeric.Components;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -10,15 +11,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddScoped<AuthenticationStateProvider, MyCustomAuthStateProvider>();
+builder.Services.AddScoped<MyCustomAuthStateProvider>();
+
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
 
 // Register a distributed cache (in-memory for single-server dev)
 builder.Services.AddDistributedMemoryCache();
-
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddAuthorization();
-
 
 // Blazored Toast
 builder.Services.AddBlazoredToast();
