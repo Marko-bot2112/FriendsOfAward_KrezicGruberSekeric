@@ -1,32 +1,43 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @using FriendsOfAward_KrezicGruberSekeric.Components.Viewmodel
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authentication.Cookies
-@using System.Threading.Tasks
 @inject NavigationManager navMgr
 @inject MyCustomAuthStateProvider MyAuthProvider
 
-    <div>
-        <label for="username">Benutzername:</label>
-        <input id="username" @bind="username" />
+<div class="login-page">
+    <div class="login-card">
+        <h2>Admin Login</h2>
+        <p class="subtitle">Bitte melde dich an</p>
+
+        <div class="form-group">
+            <label for="username">Benutzername</label>
+            <input id="username" @bind="username" placeholder="E-Mail eingeben" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Passwort</label>
+            <input id="password" type="password" @bind="password" placeholder="Passwort eingeben" />
+        </div>
+
+        <button class="login-btn" @onclick="Authenticate">
+            Anmelden
+        </button>
+
+        @if (!string.IsNullOrEmpty(errormessage))
+        {
+            <p class="error">@errormessage</p>
+        }
     </div>
-    <div>
-        <label for="password">Passwort:</label>
-        <input id="password" type="password" @bind="password" />
-    </div>
-    <button type="button" @onclick="Authenticate">Anmelden</button>
-    <p style="color: red">@errormessage</p>
+</div>
 
 @code {
-    string username = ""; 
+    string username = "";
     string password = "";
     string errormessage = "";
 
     async Task Authenticate()
     {
-        if(IsValidUser(username, password))
+        if (IsValidUser(username, password))
         {
             await MyAuthProvider.Login(username);
             navMgr.NavigateTo("/admin", forceLoad: true);
@@ -36,13 +47,14 @@
             errormessage = "Ungültiger Benutzername oder Passwort.";
         }
     }
+
     bool IsValidUser(string username, string password)
     {
-        Custom_Library.DbWrapperMySqlV2 wrappr = Custom_Library.DbWrapperMySqlV2.Wrapper;
+        var wrappr = Custom_Library.DbWrapperMySqlV2.Wrapper;
         try
         {
-            string sqlCmd = $"SELECT email, passwort FROM foa_admin WHERE email = '{username}' AND passwort = '{password}'";
-            DataTable dt = wrappr.RunQuery(sqlCmd);
+            string sqlCmd = $"SELECT email FROM foa_admin WHERE email = '{username}' AND passwort = '{password}'";
+            var dt = wrappr.RunQuery(sqlCmd);
             return dt.Rows.Count > 0;
         }
         catch (Exception ex)
@@ -50,6 +62,5 @@
             errormessage = ex.Message;
             return false;
         }
-        
     }
 }
