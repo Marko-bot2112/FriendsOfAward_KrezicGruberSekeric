@@ -129,8 +129,10 @@
             <thead>
                 <tr>
                     <th>Nr</th>
+                    <th>Abteilung</th>
                     <th>Titel</th>
                     <th>Autor</th>
+                    <th>Stimmen</th>
                 </tr>
             </thead>
             <tbody>
@@ -138,8 +140,10 @@
                 {
                     <tr>
                         <td>@d.Nr</td>
+                        <td>@d.Abteilung</td>
                         <td>@d.Titel</td>
                         <td>@d.Autor</td>
+                        <td>@d.Stimmen</td>
                     </tr>
                 }
             </tbody>
@@ -317,13 +321,15 @@
         using var workbook = new XLWorkbook(ms);
         var worksheet = workbook.Worksheet(1);
 
-        foreach (var row in worksheet.RowsUsed().Skip(1))
+        foreach (var row in worksheet.RowsUsed())
         {
             var dto = new DiplomarbeitenDto
             {
                 Nr = row.Cell(1).GetValue<int>(),
-                Titel = row.Cell(2).GetString(),
-                Autor = row.Cell(3).GetString()
+                Abteilung = row.Cell(2).GetString(),
+                Titel = row.Cell(3).GetString(),
+                Autor = row.Cell(4).GetString(),
+                Stimmen = row.Cell(5).GetValue<int>()
             };
 
             daten.Add(dto);
@@ -331,6 +337,7 @@
             rows.Add(new List<string>
         {
             dto.Nr.ToString(),
+            dto.Abteilung,
             dto.Titel,
             dto.Autor
         });
@@ -352,9 +359,10 @@
         {
             foreach (var item in daten)
             {
+                string abteilung = MySqlHelper.EscapeString(item.Abteilung);
                 string titel = MySqlHelper.EscapeString(item.Titel);
-                string autor = MySqlHelper.EscapeString(item.Autor);
-                string sql = $"INSERT INTO foa_diplomarbeiten VALUES ({item.Nr}, '{titel}', '{autor}')";
+                string autor = MySqlHelper.EscapeString(item.Autor);                
+                string sql = $"INSERT INTO foa_diplomarbeiten VALUES ('{item.Nr}', '{abteilung}', '{titel}', '{autor}', '{item.Stimmen}')";
 
 
                 wrappr.RunNonQuery(sql);
