@@ -378,7 +378,18 @@
 
     private void btn_excelExportOptions() 
     {
-    
+        try
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+            string sql = "SELECT id, abteilungskürzel, titel, autor:innen, stimmen FROM foa_diplomarbeiten";
+            DataTable dbDaten = wrappr.RunQuery(sql);
+
+            
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Fehler beim Export: " + ex.Message);
+        }
     }
 
 }
