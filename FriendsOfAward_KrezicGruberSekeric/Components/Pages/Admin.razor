@@ -3,6 +3,7 @@
 @inject IJSRuntime JS
 @inject Blazored.Toast.Services.IToastService toastService
 @inject NavigationManager NavMgr
+@using FriendsOfAward_KrezicGruberSekeric.Components.Pages.Account
 @using Microsoft.AspNetCore.Components.Authorization
 @using ClosedXML.Excel
 @using MySql.Data.MySqlClient
@@ -125,15 +126,23 @@
     @if (rows.Any())
     {
         <table class="table">
-            @foreach (var row in rows)
-            {
+            <thead>
                 <tr>
-                    @foreach (var cell in row)
-                    {
-                        <td>@cell</td>
-                    }
+                    <th>Nr</th>
+                    <th>Titel</th>
+                    <th>Autor</th>
                 </tr>
-            }
+            </thead>
+            <tbody>
+                @foreach (var d in daten)
+                {
+                    <tr>
+                        <td>@d.Nr</td>
+                        <td>@d.Titel</td>
+                        <td>@d.Autor</td>
+                    </tr>
+                }
+            </tbody>
         </table>
     }
 }
@@ -289,38 +298,45 @@
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
+        daten.Clear();
+        rows.Clear();
+
         IBrowserFile file = e.File;
 
-        // Validierung (optional, aber empfohlen)
         var extension = Path.GetExtension(file.Name).ToLower();
         if (extension != ".xlsx" && extension != ".xls" && extension != ".xlsm")
         {
-            Console.WriteLine("Keine Excel-Datei!");
+            toastService.ShowError("Keine Excel-Datei!");
             return;
         }
 
-        Console.WriteLine($"Datei: {file.Name}");
-        Console.WriteLine($"Größe: {file.Size} Bytes");
+        using var stream = file.OpenReadStream(10 * 1024 * 1024);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
 
-        // Beispiel: Datei lesen
-        using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10 MB
-        using var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream);
-
-        using var workbook = new XLWorkbook(memoryStream);
-        var worksheet = workbook.Worksheet(1); // erstes Tabellenblatt
-
-        var daten = new List<dynamic>();
+        using var workbook = new XLWorkbook(ms);
+        var worksheet = workbook.Worksheet(1);
 
         foreach (var row in worksheet.RowsUsed().Skip(1))
         {
-            daten.Add(new
+            var dto = new DiplomarbeitenDto
             {
                 Nr = row.Cell(1).GetValue<int>(),
                 Titel = row.Cell(2).GetString(),
                 Autor = row.Cell(3).GetString()
-            });
+            };
+
+            daten.Add(dto);
+
+            rows.Add(new List<string>
+        {
+            dto.Nr.ToString(),
+            dto.Titel,
+            dto.Autor
+        });
         }
+
+        toastService.ShowSuccess($"{daten.Count} Zeilen geladen.");
     }
     private void btn_ImportExcel()
     {
